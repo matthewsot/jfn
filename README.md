@@ -39,7 +39,11 @@ jfn.defineFunction(object, propertyName, argumentTypes, defaults, function);
 ```
 
 ``object`` is the object you'd like to define the function on
+
 ``propertyName`` is the name of the function that you'd like to define on ``object``
+
 ``argumentTypes`` is an array of argument types to match this function with. Pass "*" to have a catchall function.
+
 ``defaults`` is an array of default values. Note that the last value in ``defaults`` acts as the default value for the last argument specified in ``argumentTypes``
+
 ``function`` is the function to run
