@@ -20,3 +20,15 @@ testFunction("Hello!"); //String: Hello!
 testFunction(1); //Num: 1
 testFunction({ "property": "value" }); //Catchall: {"property":"value"}
 ```
+
+Default values are also possible:
+
+```
+// Returns the root of a number, defaulting to the square root
+jfn.defineFunction(Math, "root", ["number", "number"], [2], function (base, power) {
+    return Math.pow(base, (1 / power));
+});
+
+alert(Math.root(8, 3)); //2 (cubed root of 8)
+alert(Math.root(9)); //3 (square root of 9)
+```

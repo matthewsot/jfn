@@ -4,36 +4,58 @@ jfn.getProxyFunction = function (name) {
     return function () {
         var jfns = this[name]["__jfn"]["fns"];
         
+        arguments = Array.slice(arguments);
+        
         for (var i = 0; i < jfns.length; i++) {
             var jfn = jfns[i];
             
-            var matches = arguments.length === jfn.args.length;
-            for (var a = 0; a < jfn.args.length; a++) {
-                matches = jfn.args[a] === (typeof arguments[a]);
+            var matches = arguments.length <= jfn.args.length;
+            for (var a = 0; a < arguments.length; a++) {
+                matches = jfn.args[a] === "*" || jfn.args[a] === (typeof arguments[a]);
                 if (!matches) {
                     break;
                 }
             }
             
             if (matches) {
-                jfn.fn.apply(this, arguments);
-                return;
+                var argIndex = jfn.args.length;
+                for (var d = (jfn.defaults.length - 1); d >= 0; d--) {
+                    argIndex = argIndex - 1;
+                    
+                    if (typeof arguments[argIndex] === "undefined") {
+                        arguments[argIndex] = jfn.defaults[d];
+                    }
+                }
+                
+                return jfn.fn.apply(this, arguments);
             }
         }
         
         //No match found!
-        if (this[name]["jfn"].hasOwnProperty("default")) {
-            this[name]["jfn"]["default"].apply(this, arguments);
+        if (this[name]["__jfn"].hasOwnProperty("default")) {
+            return this[name]["__jfn"]["default"].apply(this, arguments);
         }
     };
 };
 
-jfn.defineFunction = function (object, name, args, fn) {
+jfn.defineFunction = function (object, name, args, defaults, fn) {
     if (typeof object === "string") {
-        fn = args;
+        fn = defaults;
+        defaults = args;
         args = name;
         name = object;
         object = window;
+    }
+    
+    if (typeof args === "function") {
+        fn = args;
+        defaults = [];
+        args = [];
+    }
+    
+    if (typeof defaults === "function") {
+        fn = defaults;
+        defaults = [];
     }
     
     if (!object.hasOwnProperty(name)) {
@@ -59,6 +81,7 @@ jfn.defineFunction = function (object, name, args, fn) {
     
     object[name]["__jfn"]["fns"].push({
         args: args,
+        defaults: defaults,
         fn: fn
     });
 };
