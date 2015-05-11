@@ -2,7 +2,7 @@ var jfn = {};
 
 jfn.getProxyFunction = function (name) {
     return function () {
-        var jfns = this[name]["__jfns"];
+        var jfns = this[name]["__jfn"]["fns"];
         
         for (var i = 0; i < jfns.length; i++) {
             var jfn = jfns[i];
@@ -35,19 +35,19 @@ jfn.defineFunction = function (object, name, args, fn) {
         object[name] = jfn.getProxyFunction(name);
     }
     
-    if (!object[name].hasOwnProperty("__jfns")) {
-        object[name]["__jfns"] = [];
+    if (!object[name].hasOwnProperty("__jfn")) {
+        object[name]["__jfn"] = { "fns": [] };
     } else {
-        for (var i = 0; i < object[name]["__jfns"].length; i++) {
-            var f = object[name]["__jfns"][i];
+        for (var i = 0; i < object[name]["__jfn"]["fns"].length; i++) {
+            var f = object[name]["__jfn"]["fns"][i];
             if (JSON.stringify(f.args) === JSON.stringify(args)) {
-                object[name]["__jfns"].splice(i, 1);
+                object[name]["__jfn"]["fns"].splice(i, 1);
                 return;
             }
         }
     }
     
-    object[name]["__jfns"].push({
+    object[name]["__jfn"]["fns"].push({
         args: args,
         fn: fn
     });
