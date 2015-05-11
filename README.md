@@ -12,6 +12,11 @@ jfn.defineFunction("testFunction", ["number"], function (num) {
     alert("Num: " + num);
 });
 
+jfn.defineFunction("testFunction", "*", function (data) {
+    alert("Catchall: " + JSON.stringify(data));
+});
+
 testFunction("Hello!"); //String: Hello!
 testFunction(1); //Num: 1
+testFunction({ "property": "value" }); //Catchall: {"property":"value"}
 ```

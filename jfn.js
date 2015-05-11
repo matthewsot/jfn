@@ -20,6 +20,11 @@ jfn.getProxyFunction = function (name) {
                 return;
             }
         }
+        
+        //No match found!
+        if (this[name]["jfn"].hasOwnProperty("default")) {
+            this[name]["jfn"]["default"].apply(this, arguments);
+        }
     };
 };
 
@@ -37,7 +42,7 @@ jfn.defineFunction = function (object, name, args, fn) {
     
     if (!object[name].hasOwnProperty("__jfn")) {
         object[name]["__jfn"] = { "fns": [] };
-    } else {
+    } else if (args !== "*") {
         for (var i = 0; i < object[name]["__jfn"]["fns"].length; i++) {
             var f = object[name]["__jfn"]["fns"][i];
             if (JSON.stringify(f.args) === JSON.stringify(args)) {
@@ -45,6 +50,11 @@ jfn.defineFunction = function (object, name, args, fn) {
                 return;
             }
         }
+    }
+    
+    if (args === "*") {
+        object[name]["__jfn"]["default"] = fn;
+        return;
     }
     
     object[name]["__jfn"]["fns"].push({
