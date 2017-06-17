@@ -1,19 +1,19 @@
 # jfn
-Playing around with Javascript functions
+Playing around with Javascript functions.
 
 A global overloadable function:
 
 ```
 jfn.defineFunction("testFunction", ["string"], function (str) {
-    alert("String: " + str);
+    return "String: " + str;
 });
 
 jfn.defineFunction("testFunction", ["number"], function (num) {
-    alert("Num: " + num);
+    return "Num: " + num;
 });
 
 jfn.defineFunction("testFunction", "*", function (data) {
-    alert("Catchall: " + JSON.stringify(data));
+    return "Catchall: " + JSON.stringify(data);
 });
 
 testFunction("Hello!"); //String: Hello!
@@ -29,8 +29,8 @@ jfn.defineFunction(Math, "root", ["number", "number"], [2], function (base, powe
     return Math.pow(base, (1 / power));
 });
 
-alert(Math.root(8, 3)); //2 (cubed root of 8)
-alert(Math.root(9)); //3 (square root of 9)
+Math.root(8, 3); //2 (cubed root of 8)
+Math.root(9); //3 (square root of 9)
 ```
 
 jfn.defineFunction arguments:
@@ -38,7 +38,7 @@ jfn.defineFunction arguments:
 jfn.defineFunction(object, propertyName, argumentTypes, defaults, function);
 ```
 
-``object`` is the object you'd like to define the function on
+``object`` is the object you'd like to define the function on (leave it out to define on the global ``window`` object)
 
 ``propertyName`` is the name of the function that you'd like to define on ``object``
 
