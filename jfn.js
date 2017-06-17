@@ -1,17 +1,20 @@
 var jfn = {};
 
-jfn.getProxyFunction = function (name) {
+//The proxy function is the function that is actually called by the user -
+//it then looks over all of the "sub-functions" stored in the .__jfn.fns array
+//to pick the right one to call
+jfn.createProxyFunction = function (name) {
     return function () {
         var jfns = this[name]["__jfn"]["fns"];
         
-        arguments = Array.slice(arguments);
+        args = Array.slice(arguments);
         
         for (var i = 0; i < jfns.length; i++) {
             var jfn = jfns[i];
             
-            var matches = arguments.length <= jfn.args.length;
-            for (var a = 0; a < arguments.length; a++) {
-                matches = jfn.args[a] === "*" || jfn.args[a] === (typeof arguments[a]);
+            var matches = args.length <= jfn.args.length;
+            for (var a = 0; a < args.length; a++) {
+                matches = jfn.args[a] === "*" || jfn.args[a] === (typeof args[a]);
                 if (!matches) {
                     break;
                 }
@@ -22,18 +25,18 @@ jfn.getProxyFunction = function (name) {
                 for (var d = (jfn.defaults.length - 1); d >= 0; d--) {
                     argIndex = argIndex - 1;
                     
-                    if (typeof arguments[argIndex] === "undefined") {
-                        arguments[argIndex] = jfn.defaults[d];
+                    if (typeof args[argIndex] === "undefined") {
+                        args[argIndex] = jfn.defaults[d];
                     }
                 }
                 
-                return jfn.fn.apply(this, arguments);
+                return jfn.fn.apply(this, args);
             }
         }
         
         //No match found!
         if (this[name]["__jfn"].hasOwnProperty("default")) {
-            return this[name]["__jfn"]["default"].apply(this, arguments);
+            return this[name]["__jfn"]["default"].apply(this, args);
         }
     };
 };
@@ -59,12 +62,15 @@ jfn.defineFunction = function (object, name, args, defaults, fn) {
     }
     
     if (!object.hasOwnProperty(name)) {
-        object[name] = jfn.getProxyFunction(name);
+        object[name] = jfn.createProxyFunction(name);
     }
     
     if (!object[name].hasOwnProperty("__jfn")) {
         object[name]["__jfn"] = { "fns": [] };
     } else if (args !== "*") {
+        //Remove any existing functions with the same arguments.
+        //Essentially, conflict resolution here is that functions added
+        //later replace those added earlier.
         for (var i = 0; i < object[name]["__jfn"]["fns"].length; i++) {
             var f = object[name]["__jfn"]["fns"][i];
             if (JSON.stringify(f.args) === JSON.stringify(args)) {
