@@ -69,7 +69,7 @@ jfn.defineFunction = function (object, name, args, defaults, fn) {
             var f = object[name]["__jfn"]["fns"][i];
             if (JSON.stringify(f.args) === JSON.stringify(args)) {
                 object[name]["__jfn"]["fns"].splice(i, 1);
-                return;
+                break;
             }
         }
     }
